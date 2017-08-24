@@ -1,0 +1,321 @@
+* Day 1
+
+** Basic Inference
+
+
+ probability density is not a probability.
+in order to get a probability, you need to integrate it.
+Integrate it over a neighborhood.
+Probability density only exists under an intergral.
+
+Can also go calculate expectation values,
+use weights to weight the function.
+
+**small world** is only a small selection of the entire distribution.
+have something that measures or 'close enough' measures the true data generating process.
+build something close enough.
+
+parametersize our space, \theta.
+any inferential model is then a choice of small world, or a likelihood of distributions over measurement.
+
+Inference is the identification of those points int he small world *consistent* with a given measurement.
+How do you define consistency?
+depends on how you define probability.
+How we define consistency, however, depends exactly on how we define probability itself.
+frequentisy vs bayesian.
+
+*** Frequentist Statistics
+
+In frequentist statistics, probability is defined in terms of frequencies and so can be applied to only the data.
+\pi_s(D | \theta).
+Still compatiable given, D.
+Can still appliy probability to measurement space in frequentist parigigm.
+
+Frequentist methods compute expectations with respect to the data to identify estimators that work well *on average*.
+Estimator is a determistic form of data, that takes data and spits out a small world.
+Point, Confidence interval, confidence set.
+
+Need to define some loss function.
+Average by integrating over all possitble.
+Minimize worst-case loss.
+
+Which has the most appropriate assumptions.
+
+*** Bayesian Inference
+
+Bayesian inference, however, treats probabilty as a general measure of uncertainty.
+
+Bayesian inference builds upon frequentist inference by treating the data *and* the parameters as uncertain.
+Bayesian is a generalization of frequentist.
+Now, we can use probabilities to quantify small world.
+Quantify what is consistent or non-consisteny by differing weights.
+
+In this more general perspective, we quantify consistency using a probability distribution over the small world.
+
+Uncertainty within the model is just an application of *Bayes' Theorem*.
+
+prior: ment to quantify everything we know about our system.
+Theoretical, expert, existing data.
+
+Plug in our likelihood: what information we learned from measurement,
+gives us a way to update (learn).
+Update the prior with the likelihood.
+
+Posterior. what you know after is function of what you know before.
+
+Conditioning on the measurement reduces our uncertainty amongst the data generation processes.
+uncertainty minimizes with more and more information.
+Need posterior to tell us something about our system.
+
+From a Bayesian perspective, all inferential questions are answered by expectations (integration).
+Modeling and calculating posterior expectation.
+
+Expectations include means and variances for posterior summaries and expected utility for decision making.
+means, variance, utility functions.
+bayesian averaging over small world.
+
+Expectations also allow us to incorporate systematic effects via *marginalization*
+nussiance parameters, intergrate them out.
+
+**** Predictive Model Comparison.
+
+The average data generation process over the entire model is given by the *posterior predictive distribution*.
+best guess, given data.
+
+\tilde{D}: observed data
+
+D: true observations
+
+\pt{D}: the true data generating process.
+
+loose normalization when going from \tilde{D} to \pi(D).
+
+When the small world does not contain the latent data generating process our models wlil, in general, misfit.
+
+Even if the small world does contain the latent data generating process, however, our models can still overfit.
+
+As with misfit, overfitting manafests as tesnsion between predictive distributions and measurements.
+
+*posterior predictive checks* visually compare the predictive distribution to the measurement.
+
+First we can check to see how consistent the measuremnt is with the inferred predictive distribution.
+no way to distinguish between the model being wrong, and the data being unlikely.
+
+Similarily, we cna check for overfitting by comparing held-out or partitioned measurement.
+
+
+** Bayesian Computation and Markov chain Monte Carlo
+
+steps in a bayesian model: prior and likelihood to get a posterior, then integrate
+to calculate expectations, and finally validate
+
+Once we've nuild a model, Bayesian computation reduces to evaluating expectations, or integrals
+robust inference is important. by having a good way to estimate expectations (integrate).
+
+Unfortantely, the cost of naive numerical integration scale e[pentially wit the dimension of the posterior.
+
+To be efficient, we need to focus computation on the relevent neighborhoods of parameter space.
+
+Buy exactly which neighborhoods endup contributiong most to arbitrary expectations?
+The tails give you no/low contributions (density is low).
+Either term is small, integrand is small.
+density and test function are 2 parts of the integrnd.
+
+Just consider density itself \pi_s(\theta | \tilde{D}).
+Some optimizer, get the mode, and compute around the mode.
+This is wrong...
+
+Relevant neighborhoods, however, are defined not by probability density but rather by probabilty mass.
+integration is averaging around a region.
+mode has high density but low volume.
+So you can get more contribution if you integrate away from the mode.
+density x volumne both ar eimportant, not just mode, and not just tails.
+Somewhere in between.
+
+Probabilty mass concentrates on a hypersurface called the *typical set* that surrponds the mode.
+
+This *concentration of measure* into a narrow typical set frustrates the accurate estimation of integrals.
+
+To accurately estimate expectations we need a method for numerically
+finding and then exploring the typicall set.
+
+Determistic: modal estimators, laplase estimators, variational estimators...
+
+Stochastic: rejection sampling, importance sampling, Markov chain modte carlo
+
+nobody looks like the average person.
+the more things you add to the model, the more likely something will be away from the average.
+
+MAP (modal estimation) are very fragile.
+needs a lot of symmetry.
+
+"A conceptual introduction of hamilton monte carlo"
+
+Bob carpenter: has a case study
+
+MCMC is very flexible.
+
+*** Markov chain Monte Carlo
+
+A markov trnsition that targets our desired distribution naturally concentrates towards probability mass.
+
+But if we have a transition function that perserves the posteror...
+the transition will always concentrate towards the typical set.
+
+start posterior, average all possible jumps,
+
+A Markove transition that targes our desired distribution naturally concrates towards probabilty mass.
+
+One approach is to use Markov chains as a generic scheme for finding and then exploring typical sets.
+Try to compute expectations, by quantifying the typical set.
+
+If run long enough, the Markov chain defines consistent *Markov Chain Monte Carlo estimators*.
+
+Transition function will depend how much of the typical set MCMC will cover.
+Some will get stuck in regions,
+others will be able to jump around.
+
+MCMC towards infiinity, will always converge to true expectation.
+Whre and how it convereges is really important.
+
+**** ideal circumstane
+
+Under ideal conditions, MCMC estimators converge to the true expectations in a very practical progression.
+
+**** non ideal circumstances
+
+There are many pathological posterior geometries, however, that spoil these ideal conditions.
+areas of high curviture are problematic.
+
+*Geometric ergodicity* ensures that there are no posteror pathologies obstructing accurate MCMC estimation
+will satisify central limit theorem.
+Markov Chain Standard Error = varance / effective sample size
+ESS only meaningful *only* if you have these properties.
+
+geometic erdocity -> CLT -> inference
+
+**** Diagnosing Inadquate Convergence
+
+How do we verify that not only geometic ergodicity holds, but also MC converged
+
+Visual diagnosis of *trace plots* is one particularly immediate option. (Fuzzy catipiliar).
+
+For example, we might identify regions of high curvature where the Markov chins stick.
+
+Unfortunately visual diagnosis can be misleaning.
+Multi modal distrbutions. when behavior changes with multiple initial conditions.
+Maybe don't run long enough.
+
+More chains you run, more you can identify pathologies.
+
+Essentially run an ANOVA between chains.
+The best stragethi is to run multiple chaines from diffuse initilizations and compare them using the Rhat statistic.
+R = 1 is good evidence that geometic ergodicity exists.
+if *any* of the chains run poorly, then the model is wrong. don't throw away that 1 bad chain..
+R_hat larger than 1 than something is wrong.
+1 to 1.1 is considered 'consistent' in practice.
+
+B is between chain variance
+
+W is within chain variance
+
+r_hat: 1.15 vs 7. run chians longer, vs something horribly is wrong.
+
+varational methods (generic variational methods) are very fragile, unless gaussian.
+(variational inference algorithim).
+
+estimation propagation where you over estimate variance can be something to do.
+
+folk thorem: computation problems is a sign that model is wrong (andy gelman).
+confilct between prior/likelihood; data/likelihood
+
+If there are no indiciations of pathologies, then we can move on to quantifying the accuracy of our estimates (MCSE).
+
+Finally, we can construct an MCMC estimate of any pertinent function as well as an estimate of its error.
+Compare N_eff (n effective samples).
+Stan is slow per iteration, but get many more effective samples.
+
+MCSE: how accurate is this mean.
+
+** Hamilton Monte Carlo
+The previous discussion presumed the existance of a Markov chain that targets our specific posterior.
+
+analogy of gravity and adding momentum.
+
+HMC is a way to add this 'momentum', this needed correction.
+
+it's fast, and robust exploration of the distributions common in practice.
+
+Using gradients to drive motion of space, but really care about the shadows of exploration.
+works in high dimension.
+
+When HMC fails to be geometic eurodic, it will tell you!
+
+This is the 'divergence warning' you see in stan.
+Something happening here.
+incredibly sensitive to problems.
+
+bayesian fraction of missing information: more novel.
+usually paired with divergence.
+but rarely alone.
+
+HMC fast, robust, and when it fails it will tell you.
+This is why it's sutible for generic computation.
+
+HMC is an implementation of MCMC.
+
+Stan: separate computation from modeling.
+
+Modeling language,
+automatic differentiation (calculate the gradients),
+HMC (which will use for momentum calculations)
+
+** Stan
+
+Stanislaw Ulam (1909 - 1984): Monte Carlo Method
+ferminac.
+
+Language... and algorithims.
+Probabilistic programming language and inference algorithms
+
+stan program. declares data and (constrained) parameter variables.
+defines log posteror (or penalized likelihood)
+
+stan ecosystem.
+
+mc-stan.org/users/citations
+
+github.com/stan-dev/stancon_talks
+
+Computations are actually done on the log scale.
+this is important if you have your own custom PDF and need to make calculations.
+
+*** Data Block
+
+declare data types, sizes and constraints
+
+read from data source and constraints validated
+
+*** parameters block
+
+*** model block
+
+*** generated quantities
+
+\Theta \sim \Pi(\theta | D)
+
+where \Theta is a vector of (\alpha, \beta, \sigma)
+
+updating theta which updates the data generating process.
+
+What are reasonable values for theta?
+
+Updated knowledge should feed into data generation process.
+
+*** programming in stan
+
+http://mc-stan.org/workshops/learn_bayes/
+
+http://mc-stan.org/workshops/
+
+rstanarm: Bayesian Applied Regression Modeling via Stan
