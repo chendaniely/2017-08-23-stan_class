@@ -1,3 +1,7 @@
+http://mc-stan.org/workshops/
+
+http://mc-stan.org/workshops/learn_bayes/
+
 * Day 1
 
 ** Basic Inference
@@ -319,3 +323,179 @@ http://mc-stan.org/workshops/learn_bayes/
 http://mc-stan.org/workshops/
 
 rstanarm: Bayesian Applied Regression Modeling via Stan
+
+* Day 2
+
+** Review
+
+In Bayesian inference we use probability distributions to quantify our information about the *small world*
+
+concentrate around the true data generating process by updating
+
+All bayesian computations reduce to expectations with respect to the posterior distributation
+
+E[f] = \int d\theta\pi_s(\theta | \tilde{D})f(\theta)
+
+** Best Practices
+
+Examples will follow best practices
+
+*** 1a
+
+Maintain reproducibilty by saving the model, data, and inits in files and the R commands in scripts
+
+don't embed stan program as embeded text string.
+
+computation is independent from language
+
+*** 1b
+
+Use version control on your files and scripts
+
+*** 2
+
+Start simple! build your model in stages, ensuring good fits at each stage
+
+*** 3
+
+Fit your model to simulated diata to ensure that Stan can recover the true values
+
+arbitrary parameter values
+
+sample parameters from priors, sample data.
+Cook, Gelman, Rubin procedure.
+
+*** 4
+
+Keep an eye on the diagnostics
+
+** Regression Modeling
+
+Recall that in Bayesian inference we build up an inferential model by specifying a priror and a likelihood
+
+\pi_s(\theta | \tilde{D}) \sim \pi_s(\tilde{D} | \theta) \pi_s(\theta)
+
+\pi (\theta | \tilde{D}) \sim \pi (\tilde{D} | \theta) \pi (\theta)
+
+Likelihoods model the measurement process and are most naturally specified generatively.
+
+Similarly, we can also model unobserved variables, such as the parameters, generatively
+
+This generative decomposition allows us to focus
+
+Many of the most common and useful modeling techniques are forms of **regression**.
+
+*** Foundations of Regression
+
+Often the data naturally separate into variates, y, and covariates, x.
+
+D -> {y, x}
+
+x may be easier to measure than y.
+y can be measured in a few cases, much easier to measure x and predict y.
+Need to understand statistical relationship between x and y.
+
+Regression models the statistical relationship between the variates and the covariates.
+This is a *statistical relationship*. Not causality.
+
+\pi(y, x | \theta) = \pi (y | x, \theta) \pi (x | \theta)
+
+distribution of covariates, and data given covariates.
+
+We typically assume the covariates are independent of the model parameters.
+No selection effects, for example.
+
+In which case the likelihood becomes a model of the variates conditional on the vovariates.
+
+\pi(y, x | \theta) = \pi(y | x, \theta) \pi(x | \theta)
+
+\pi(y, x | \theta) = \pi(y | x, \theta)\pi(x)
+
+\pi(y, x | \theta) \sim \pi(y | x, \theta)
+
+Co variates are often restricted to a single effective parameter through a determisnistic mapping
+
+\pi(y|x, \theata) = some function, normal, binomial, etc...
+
+This imediately generalizes to multiple effective parameters
+
+Gamma... shape and scale dependent on covariates.
+
+*** Linear Models
+
+When an effective parameter is unstrained we can model it with a linear mapping
+
+f(x, \alpha, \beta) = \beta * x + \alpha
+
+Multiple covariates are commonly encapulated in a design matrix
+
+f(x, \alpha, \beta) = \sum_{n, i} X_{in} \beta_i + \alpha
+
+= X^T \beta + \alpha
+
+you can keep X^T\beta as the design matrix,
+this can drastically speed up computation.
+break with convention!
+
+When the measurement model is Gaussian we recover the ubiquitous Gaussian-Linear model.
+
+When there are few data than covariates, however, linear models are subject to collinearity.
+
+In collinearity some of the slopes are fully determined while the others are completely undetermined.
+
+...
+
+Weakly-information containment priors are typically defined in terms of Gaussian distribution.
+
+The bredth of those priors is modivated by reasoning about plausible variations. Think *units*.
+
+tails when things get close to 0 (nothing is impossible!)
+
+uniform distributions are informative,
+can bias prior towards the extremes.
+e.g., 10m is just as likely as 1.
+they also have no scale
+
+hard boundries will cause the posterior to slam against it.
+and weird things will happen.
+rather, think about soft regularizations, and maybe heavier tails.
+
+weakly informative: good value with good spread of possible values,
+do not need a strong level of precision.
+
+*** General Linear Model
+
+constrained effective parameters are non amenable to linear models
+
+\theta \in (a, b)
+
+X^T\beta + \alpha \in (- \infty, \infty)
+
+But we can generalize linear models with a link function
+
+g^{-1}: (a, b) -> (-\infty, \infty)
+
+**** While bounded parameters are modeled with the *logit* link function
+
+logit: (0, 1) -> (-\infty, \infty)
+
+logistic(X^T\beta + \alpha) \in (0, 1)
+
+success/failure data subject to covariates can be modeled with generalized binomial/Bernoulli models
+
+\pi(y | X, \alpha, \beta) = Ber(y | logistic(X^T \beta + \alpha))
+
+**** Positive parameters are modeled with the log link function
+
+log: (0, \infty) -> (-\infty, \infty)
+
+**** Count data whose rate depends on covariates can be modeled with a generalized Poisson model.
+
+poisson log regression
+
+In some applications the Poisson likelihood is too restrictive
+
+But we can incorporate overdispersion with a generalizaed negative binomial model.
+
+Stan: NegBin2
+for GLM
