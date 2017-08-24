@@ -2,6 +2,9 @@ http://mc-stan.org/workshops/
 
 http://mc-stan.org/workshops/learn_bayes/
 
+
+sharad goel stanford: https://5harad.com/
+
 * Day 1
 
 ** Basic Inference
