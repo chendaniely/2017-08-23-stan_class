@@ -1,4 +1,6 @@
 *~
+output/*
+data/*
 
 # ignore the compiled stan model
 *.rds
